@@ -38,7 +38,7 @@ class TaskController extends GetxController {
               print('Tasks are taken!');
               for (var task in todos.docs) {
                 //print('${task.id} => ${task.data()}');
-                tasks.add(TodoModel.fromFirestore(task, null));
+                tasks.add(TodoModel.fromFirestore(task));
               }
             },
       onError: (e) => print('Failed to take the tasks: $e'),

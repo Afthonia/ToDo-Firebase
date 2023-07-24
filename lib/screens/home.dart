@@ -88,12 +88,24 @@ class Home extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
-                children: taskController.filteredTodos.map((todo) => TaskCard(
+                children: taskController.filteredTodos.isEmpty
+                      ? [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'NO TASK!',
+                              style: TextStyle(
+                                  color: Constants.secondaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width / 16),
+                            ),
+                          )
+                        ]
+                      : taskController.filteredTodos.map((todo) => TaskCard(
                               todo: todo ?? TodoModel(id: 0, text: "No Task", isCompleted: false),
                             ))
                         .toList()
-
-
               ),
             ),
           ),

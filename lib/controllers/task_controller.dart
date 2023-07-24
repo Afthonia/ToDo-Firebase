@@ -29,11 +29,11 @@ class TaskController extends GetxController {
 
     tasks.add(todo);
 
-    tasksInstance.collection('todo').doc('${todo.id}').set(todo.toFirestore());
+    tasksInstance.collection('todos').doc('${todo.id}').set(todo.toFirestore());
   }
 
   void getTasks() {
-    tasksInstance.collection('todo').get().then(
+    tasksInstance.collection('todos').get().then(
             (todos) {
               print('Tasks are taken!');
               for (var task in todos.docs) {
@@ -50,7 +50,7 @@ class TaskController extends GetxController {
   void deleteTask(int id) {
     tasks.removeWhere((todo) => todo.id == id);
 
-    tasksInstance.collection('todo')
+    tasksInstance.collection('todos')
         .doc('$id')
         .delete()
         .then((value) => print("Task deleted!"))
@@ -60,7 +60,7 @@ class TaskController extends GetxController {
   void editTask(String text, int id) {
     final todo = tasks.firstWhere((todo) => todo.id == id);
 
-    tasksInstance.collection('todo')
+    tasksInstance.collection('todos')
         .doc('$id')
         .update({'text': text})
         .then((value) => print("Task updated!"))
@@ -75,7 +75,7 @@ class TaskController extends GetxController {
 
     todo.isCompleted = !todo.isCompleted;
 
-    tasksInstance.collection('todo')
+    tasksInstance.collection('todos')
         .doc('$id')
         .update({'isCompleted': todo.isCompleted})
         .then((value) => print("Task updated!"))

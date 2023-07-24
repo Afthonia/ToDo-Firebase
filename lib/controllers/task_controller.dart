@@ -9,7 +9,7 @@ class TaskController extends GetxController {
 
   final searchText = "".obs;
 
-  int idCounter = new DateTime.now().microsecondsSinceEpoch;
+  int idCounter = DateTime.now().microsecondsSinceEpoch;
 
   final uncheckedTasks = false.obs;
 

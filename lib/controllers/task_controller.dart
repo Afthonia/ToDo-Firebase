@@ -1,22 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:todo/models/todo_model.dart';
+import 'package:todo/services/task_api.dart';
 
 class TaskController extends GetxController {
   final tasks = <TodoModel>[].obs;
 
-  FirebaseFirestore tasksInstance = FirebaseFirestore.instance;
-
   final searchText = "".obs;
-
-  int idCounter = DateTime.now().microsecondsSinceEpoch;
 
   final uncheckedTasks = false.obs;
 
   Iterable<TodoModel?> get filteredTodos => tasks
       .where((todo) => !uncheckedTasks.value || !todo.isCompleted)
-      .where((todo) =>
-          todo.text.toLowerCase().contains(searchText.value.toLowerCase()));
+      .where((todo) => todo.text.toLowerCase().contains(searchText.value.toLowerCase()));
 
   @override
   void onInit() {
@@ -25,62 +20,37 @@ class TaskController extends GetxController {
   }
 
   Future<void> addTask(String task) async {
-    TodoModel todo = TodoModel(id: idCounter, text: task, isCompleted: false);
-
-    tasks.add(todo);
-
-    tasksInstance.collection('todos').doc('${todo.id}').set(todo.toFirestore());
+    final todo = await TaskApi.addTask(task);
+    if (todo != null) {
+      tasks.add(todo);
+    }
   }
 
-  void getTasks() {
-    tasksInstance.collection('todos').get().then(
-            (todos) {
-              print('Tasks are taken!');
-              for (var task in todos.docs) {
-                //print('${task.id} => ${task.data()}');
-                tasks.add(TodoModel.fromFirestore(task));
-              }
-            },
-      onError: (e) => print('Failed to take the tasks: $e'),
-    );
-
-
+  void getTasks() async {
+    tasks.value = await TaskApi.getTasks();
   }
 
-  void deleteTask(int id) {
-    tasks.removeWhere((todo) => todo.id == id);
-
-    tasksInstance.collection('todos')
-        .doc('$id')
-        .delete()
-        .then((value) => print("Task deleted!"))
-        .catchError((error) => print("Failed to delete task: $error"));
+  void deleteTask(String id) async {
+    final deletedID = await TaskApi.deleteTask(id);
+    if (deletedID != null) {
+      tasks.removeWhere((todo) => todo.id == deletedID);
+    }
   }
 
-  void editTask(String text, int id) {
+  void editTask(String text, String id) async {
+    final editedID = await TaskApi.updateTask(id, text);
+    if (editedID == null) return;
     final todo = tasks.firstWhere((todo) => todo.id == id);
-
-    tasksInstance.collection('todos')
-        .doc('$id')
-        .update({'text': text})
-        .then((value) => print("Task updated!"))
-        .catchError((error) => print("Failed to update task: $error"));
-
     todo.text = text;
     tasks.refresh();
   }
 
-  void toggle(int id) {
+  void toggle(String id) async {
     final todo = tasks.firstWhere((todo) => todo.id == id);
-
-    todo.isCompleted = !todo.isCompleted;
-
-    tasksInstance.collection('todos')
-        .doc('$id')
-        .update({'isCompleted': todo.isCompleted})
-        .then((value) => print("Task updated!"))
-        .catchError((error) => print("Failed to update task: $error"));
-
+    final targetCompleted = !todo.isCompleted;
+    final completed = await TaskApi.toggleTask(id, targetCompleted);
+    if (completed == null) return;
+    todo.isCompleted = completed;
     tasks.refresh();
   }
 }

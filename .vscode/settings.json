@@ -1,3 +1,13 @@
 {
-    "C_Cpp.errorSquiggles": "Enabled"
+    "dart.flutterSdkPath": "/opt/flutter",
+    "dart.lineLength": 100,
+    "[dart]": {
+        "editor.rulers": [
+            100
+        ],
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true,
+    }
 }

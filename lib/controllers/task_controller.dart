@@ -19,6 +19,14 @@ class TaskController extends GetxController {
 
   @override
   void onInit() {
+    // ever(searchText, (val) {
+    //   print(val);
+    // });
+
+    // debounce(searchText, (val) {
+    //   print(val);
+    // }, time: const Duration(seconds: 1));
+
     super.onInit();
     getTasks();
   }

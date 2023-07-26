@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:todo/models/todo_model.dart';
 import 'package:todo/services/task_api.dart';
@@ -8,6 +10,8 @@ class TaskController extends GetxController {
   final searchText = "".obs;
 
   final uncheckedTasks = false.obs;
+
+  late final StreamSubscription<List<TodoModel>> getTasksHandle;
 
   Iterable<TodoModel?> get filteredTodos => tasks
       .where((todo) => !uncheckedTasks.value || !todo.isCompleted)
@@ -26,31 +30,29 @@ class TaskController extends GetxController {
     }
   }
 
-  void getTasks() async {
-    tasks.value = await TaskApi.getTasks();
+  void getTasks() {
+    getTasksHandle = TaskApi.getTasks().listen((todoList) {
+      tasks.value = todoList;
+    });
   }
 
   void deleteTask(String id) async {
-    final deletedID = await TaskApi.deleteTask(id);
-    if (deletedID != null) {
-      tasks.removeWhere((todo) => todo.id == deletedID);
-    }
+    await TaskApi.deleteTask(id);
   }
 
   void editTask(String text, String id) async {
-    final editedID = await TaskApi.updateTask(id, text);
-    if (editedID == null) return;
-    final todo = tasks.firstWhere((todo) => todo.id == id);
-    todo.text = text;
-    tasks.refresh();
+    await TaskApi.updateTask(id, text);
   }
 
   void toggle(String id) async {
     final todo = tasks.firstWhere((todo) => todo.id == id);
     final targetCompleted = !todo.isCompleted;
-    final completed = await TaskApi.toggleTask(id, targetCompleted);
-    if (completed == null) return;
-    todo.isCompleted = completed;
-    tasks.refresh();
+    await TaskApi.toggleTask(id, targetCompleted);
+  }
+
+  @override
+  void onClose() {
+    getTasksHandle.cancel();
+    super.onClose();
   }
 }

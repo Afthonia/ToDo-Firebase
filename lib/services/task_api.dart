@@ -3,15 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:todo/models/todo_model.dart';
 
 class TaskApi {
-  static Future<List<TodoModel>> getTasks() async {
+  static Stream<List<TodoModel>> getTasks() {
     try {
-      final todos = await FirebaseFirestore.instance.collection('todos').get();
-      return todos.docs.map((e) => TodoModel.fromMap(e.data())).toList();
+      final todos = FirebaseFirestore.instance.collection('todos').snapshots();
+      return todos.map((e) => e.docs.map((e) => TodoModel.fromMap(e.data())).toList());
     } catch (e) {
       debugPrint("Get Tasks Error: $e");
     }
-
-    return [];
+    return Stream.value([]);
   }
 
   static Future<TodoModel?> addTask(String task) async {

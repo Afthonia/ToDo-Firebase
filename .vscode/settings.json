@@ -1,0 +1,21 @@
+{
+    "dart.flutterSdkPath": "C:\\programs\\flutter",
+    "dart.lineLength": 100,
+    "[dart]": {
+        "editor.rulers": [
+            100
+        ],
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll": true,
+        "source.organizeImports": true,
+    },
+    "cSpell.words": [
+        "Firestore"
+    ],
+    "C_Cpp.errorSquiggles": "enabled",
+    "errorLens.statusBarIconsEnabled": true,
+    "errorLens.editorHoverPartsEnabled": {
+        "messageEnabled": true
+    }
+}
